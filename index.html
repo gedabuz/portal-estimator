@@ -3,103 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Estimator Profesional</title>
+    <title>Portal Estimator & BOQ Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sort-icon { font-size: 0.8em; color: #9ca3af; margin-left: 4px; cursor: pointer; }
+        .menu-active { background-color: #2563eb; color: white; font-weight: bold; }
+        .menu-inactive { color: #d1d5db; }
+        .menu-inactive:hover { background-color: #1f2937; color: white; }
+    </style>
 </head>
-<body class="bg-gray-50 p-8 font-sans">
-    <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-        <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-800">Manajemen Dokumen & BOQ</h2>
-        
-        <form id="uploadForm" class="flex flex-wrap gap-4 mb-8 bg-blue-50 p-5 rounded-lg border border-blue-100">
-            <input type="file" id="fileInput" required class="border p-2 bg-white rounded flex-1 min-w-[200px]">
-            <select id="inputProject" required class="border p-2 rounded">
-                <option value="Proyek A">Proyek A</option>
-                <option value="Proyek B">Proyek B</option>
-            </select>
-            <select id="inputCategory" required class="border p-2 rounded">
-                <option value="BOQ">BOQ (Excel)</option>
-                <option value="Gambar">Gambar (CAD/PDF)</option>
-            </select>
-            <select id="inputUser" required class="border p-2 rounded">
-                <option value="Tim Estimator">Tim Estimator</option>
-            </select>
-            <button type="submit" id="btnSubmit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold shadow transition">Unggah File</button>
-        </form>
+<body class="bg-gray-100 flex h-screen font-sans overflow-hidden text-gray-800">
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse border border-gray-200">
-                <thead class="bg-gray-100 text-sm text-gray-700 uppercase">
-                    <tr>
-                        <th class="p-3 border font-semibold">Nama File</th>
-                        <th class="p-3 border font-semibold">Proyek</th>
-                        <th class="p-3 border font-semibold">Kategori</th>
-                        <th class="p-3 border font-semibold">Tanggal</th>
-                        <th class="p-3 border text-center font-semibold">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody" class="text-gray-600 text-sm"></tbody>
-            </table>
+    <div id="loginScreen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Login Portal</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Username</label>
+                    <input type="text" id="loginUser" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Password</label>
+                    <input type="password" id="loginPass" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">Masuk</button>
+            </form>
+            <p class="text-xs text-center text-gray-400 mt-6">Dibuat oleh Rahmatullah © 2026</p>
         </div>
     </div>
 
-    <script>
-        // GANTI BAGIAN INI DENGAN LINK RENDER ANDA
-        const BACKEND_URL = "https://backend-estimator-production-d0e4.up.railway.app"; 
+    <div id="mainApp" class="flex w-full h-full hidden">
+        
+        <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-lg shrink-0">
+            <div class="p-6 border-b border-gray-700">
+                <h1 class="text-xl font-bold tracking-wider">Estimator<span class="text-blue-400">Hub</span></h1>
+                <p class="text-xs text-gray-400 mt-1">Sistem Manajemen Internal</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard File</button>
+                <button onclick="switchMenu('upload')" id="menu-upload" class="w-full text-left p-3 rounded menu-inactive">⬆️ Upload File Baru</button>
+                <button onclick="switchMenu('admin')" id="menu-admin" class="w-full text-left p-3 rounded menu-inactive hidden">🔑 Manajemen User</button>
+            </nav>
+            <div class="p-4 border-t border-gray-700 text-sm">
+                <p class="text-gray-400">Masuk sebagai:</p>
+                <p id="displayUserName" class="font-bold text-blue-400 truncate"></p>
+                <button onclick="logout()" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded">Keluar</button>
+            </div>
+        </aside>
 
-        async function loadFiles() {
-            try {
-                const res = await fetch(`${BACKEND_URL}/files`);
-                const data = await res.json();
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = '';
+        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+            
+            <div id="view-dashboard" class="flex-1 overflow-y-auto p-6">
+                <h2 class="text-2xl font-bold mb-6">Dashboard File Terunggah</h2>
                 
-                data.forEach(item => {
-                    tbody.innerHTML += `
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-3 font-medium text-gray-900">${item.name}</td>
-                            <td class="p-3">${item.project}</td>
-                            <td class="p-3">${item.category}</td>
-                            <td class="p-3">${item.date}</td>
-                            <td class="p-3 text-center">
-                                <a href="${BACKEND_URL}/download/${item.id}" class="text-white bg-green-500 hover:bg-green-600 px-4 py-1.5 rounded shadow text-sm font-bold transition">
-                                    Unduh
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (err) { console.error("Gagal memuat data", err); }
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex gap-4">
+                    <input type="text" id="searchBox" placeholder="Pencarian Cepat (Nama File / Keterangan)..." class="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500">
+                    <input type="date" id="searchDate" class="border p-2 rounded text-gray-600">
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-blue-50 border-b border-gray-200 text-sm font-semibold">
+                            <tr>
+                                <th class="p-4 cursor-pointer" onclick="sortTable('name')">Nama File <span class="sort-icon">↕</span></th>
+                                <th class="p-4 cursor-pointer" onclick="sortTable('date')">Tanggal <span class="sort-icon">↕</span></th>
+                                <th class="p-4">Proyek</th>
+                                <th class="p-4">Keterangan Khusus</th>
+                                <th class="p-4">User</th>
+                                <th class="p-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-upload" class="flex-1 overflow-y-auto p-6 hidden">
+                <h2 class="text-2xl font-bold mb-6">Upload Dokumen Baru</h2>
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200 max-w-2xl">
+                    <form id="uploadForm" class="space-y-4">
+                        <div>
+                            <label class="block font-medium mb-1">Pilih File</label>
+                            <input type="file" id="fileInput" required class="w-full border p-2 rounded">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-medium mb-1">Nama Proyek</label>
+                                <input type="text" id="inputProject" required placeholder="Contoh: Tower A" class="w-full border p-2 rounded">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1">Kategori</label>
+                                <select id="inputCategory" class="w-full border p-2 rounded">
+                                    <option value="BOQ">BOQ (Hasil Hitungan)</option>
+                                    <option value="Gambar Perencana">Gambar Perencana</option>
+                                    <option value="Harga Material">Harga Material</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Keterangan Khusus (Opsional)</label>
+                            <textarea id="inputKeterangan" rows="3" placeholder="Tambahkan catatan khusus untuk tim..." class="w-full border p-2 rounded"></textarea>
+                        </div>
+                        
+                        <div id="progressContainer" class="hidden">
+                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                                <span id="progressText">Mengunggah... 0%</span>
+                                <span id="progressSize">0 MB / 0 MB</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnSubmitUpload" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">Mulai Unggah</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-admin" class="flex-1 overflow-y-auto p-6 hidden">
+                <h2 class="text-2xl font-bold mb-6">Manajemen Anggota Tim</h2>
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200 max-w-xl mb-8">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Buat Akun Baru</h3>
+                    <form id="createUserForm" class="space-y-4">
+                        <div>
+                            <label class="block font-medium mb-1">Nama Lengkap</label>
+                            <input type="text" id="newFullName" required class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Username (Untuk Login)</label>
+                            <input type="text" id="newUsername" required class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Password</label>
+                            <input type="text" id="newPassword" required class="w-full border p-2 rounded">
+                        </div>
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">Daftarkan Anggota</button>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow border border-gray-200 p-4 max-w-xl">
+                    <h3 class="font-bold text-lg mb-2">Daftar Anggota Saat Ini (Memori Server)</h3>
+                    <ul id="userList" class="list-disc pl-5 text-gray-600"></ul>
+                </div>
+            </div>
+
+            <footer class="bg-white p-4 border-t border-gray-200 text-center text-sm font-medium text-gray-500 mt-auto">
+                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Rahmatullah</span> © 2026
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // MASUKKAN URL RAILWAY/ADAPTABLE/GLITCH ANDA DI SINI
+        const BACKEND_URL = "https://URL-RAILWAY-ANDA.up.railway.app"; 
+
+        let userToken = localStorage.getItem('token');
+        let userRole = localStorage.getItem('role');
+        let userName = localStorage.getItem('name');
+
+        let dbData = [];
+        let sortDirection = true;
+
+        // CEK LOGIN SAAT HALAMAN DIBUKA
+        if (userToken) {
+            showApp();
         }
 
-        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+        // ==========================
+        // FUNGSI LOGIN & AUTENTIKASI
+        // ==========================
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const btn = document.getElementById("btnSubmit");
-            btn.innerText = "Mengunggah...";
-            btn.disabled = true;
+            const u = document.getElementById("loginUser").value;
+            const p = document.getElementById("loginPass").value;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/login`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('name', data.name);
+                    userToken = data.token; userRole = data.role; userName = data.name;
+                    showApp();
+                } else { alert(data.message); }
+            } catch (err) { alert('Gagal terhubung ke server'); }
+        });
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('displayUserName').innerText = userName;
+            
+            // Tampilkan menu admin jika rolenya 'owner'
+            if (userRole === 'owner') {
+                document.getElementById('menu-admin').classList.remove('hidden');
+                loadUsersAdmin(); // Muat daftar user
+            }
+            loadFiles(); // Muat tabel data
+        }
+
+        // ==========================
+        // UI NAVIGATION SIDEBAR
+        // ==========================
+        function switchMenu(viewName) {
+            // Sembunyikan semua view
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-upload').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            
+            // Matikan semua warna menu
+            document.getElementById('menu-dashboard').className = "w-full text-left p-3 rounded menu-inactive";
+            document.getElementById('menu-upload').className = "w-full text-left p-3 rounded menu-inactive";
+            document.getElementById('menu-admin').className = "w-full text-left p-3 rounded menu-inactive" + (userRole !== 'owner' ? ' hidden' : '');
+
+            // Hidupkan view dan warna menu yang dipilih
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`menu-${viewName}`).className = "w-full text-left p-3 rounded menu-active";
+        }
+
+        // ==========================
+        // UPLOAD DENGAN PROGRESS BAR (XMLHttpRequest)
+        // ==========================
+        document.getElementById("uploadForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const btn = document.getElementById("btnSubmitUpload");
+            const pCont = document.getElementById("progressContainer");
+            const pBar = document.getElementById("progressBar");
+            const pText = document.getElementById("progressText");
+            const pSize = document.getElementById("progressSize");
+
+            btn.disabled = true; btn.innerText = "Memproses...";
+            pCont.classList.remove("hidden"); // Tampilkan Progress Bar
 
             const formData = new FormData();
             formData.append("file", document.getElementById("fileInput").files[0]);
             formData.append("project", document.getElementById("inputProject").value);
             formData.append("category", document.getElementById("inputCategory").value);
-            formData.append("user", document.getElementById("inputUser").value);
+            formData.append("keterangan", document.getElementById("inputKeterangan").value);
+            formData.append("user", userName); // Otomatis memakai nama pelogin
+            formData.append("token", userToken);
 
-            try {
-                const res = await fetch(`${BACKEND_URL}/upload`, { method: 'POST', body: formData });
-                const result = await res.json();
-                if(result.status === 'success') {
-                    alert('File berhasil diunggah!');
-                    loadFiles();
-                } else {
-                    alert('Gagal mengunggah file.');
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", `${BACKEND_URL}/upload`, true);
+
+            // Melacak Proses Upload
+            xhr.upload.addEventListener("progress", function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    const loadedMB = (e.loaded / (1024 * 1024)).toFixed(2);
+                    const totalMB = (e.total / (1024 * 1024)).toFixed(2);
+                    
+                    pBar.style.width = percentComplete + "%";
+                    pText.innerText = `Mengunggah... ${percentComplete}%`;
+                    pSize.innerText = `${loadedMB} MB / ${totalMB} MB`;
                 }
-            } catch (err) { alert('Terjadi kesalahan jaringan.'); }
-            
-            btn.innerText = "Unggah File";
-            btn.disabled = false;
-            document.getElementById("uploadForm").reset();
+            });
+
+            // Respon setelah upload selesai
+            xhr.onload = function() {
+                btn.disabled = false; btn.innerText = "Mulai Unggah";
+                pCont.classList.add("hidden"); // Sembunyikan Progress Bar
+                
+                if (xhr.status === 200) {
+                    const result = JSON.parse(xhr.responseText);
+                    if (result.status === 'success') {
+                        alert("File berhasil diunggah!");
+                        document.getElementById("uploadForm").reset();
+                        pBar.style.width = "0%";
+                        loadFiles();
+                        switchMenu('dashboard'); // Otomatis kembali ke dashboard
+                    } else { alert(result.message); }
+                } else { alert("Gagal mengunggah file. Sesi mungkin kadaluarsa."); logout(); }
+            };
+
+            xhr.onerror = function() {
+                alert("Terjadi kesalahan jaringan.");
+                btn.disabled = false; btn.innerText = "Mulai Unggah";
+                pCont.classList.add("hidden");
+            };
+
+            xhr.send(formData);
         });
 
-        loadFiles();
+        // ==========================
+        // TABEL & FILTERING DENGAN KOLOM KETERANGAN
+        // ==========================
+        async function loadFiles() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/files`);
+                dbData = await res.json();
+                renderTable(dbData);
+            } catch (err) { console.error("Gagal memuat data", err); }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-100 transition">
+                        <td class="p-4 font-bold text-gray-900">${item.name}</td>
+                        <td class="p-4">${item.date}</td>
+                        <td class="p-4"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">${item.project}</span></td>
+                        <td class="p-4 text-gray-600 italic break-words max-w-xs">${item.keterangan || '-'}</td>
+                        <td class="p-4">${item.user}</td>
+                        <td class="p-4 text-center">
+                            <a href="${BACKEND_URL}/download/${item.id}?token=${userToken}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1.5 px-4 rounded shadow">Unduh</a>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("searchBox").addEventListener("input", (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = dbData.filter(i => i.name.toLowerCase().includes(val) || (i.keterangan && i.keterangan.toLowerCase().includes(val)));
+            renderTable(filtered);
+        });
+
+        document.getElementById("searchDate").addEventListener("change", (e) => {
+            const val = e.target.value;
+            renderTable(dbData.filter(i => val === "" || i.date === val));
+        });
+
+        function sortTable(column) {
+            sortDirection = !sortDirection;
+            const sorted = [...dbData].sort((a, b) => {
+                if (a[column] < b[column]) return sortDirection ? -1 : 1;
+                if (a[column] > b[column]) return sortDirection ? 1 : -1;
+                return 0;
+            });
+            renderTable(sorted);
+        }
+
+        // ==========================
+        // ADMIN PANEL LOGIC
+        // ==========================
+        document.getElementById("createUserForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const payload = {
+                token: userToken,
+                newFullName: document.getElementById("newFullName").value,
+                newUsername: document.getElementById("newUsername").value,
+                newPassword: document.getElementById("newPassword").value
+            };
+            try {
+                const res = await fetch(`${BACKEND_URL}/create-user`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.status === 'success') {
+                    document.getElementById("createUserForm").reset();
+                    loadUsersAdmin();
+                }
+            } catch (err) { alert('Gagal memproses data'); }
+        });
+
+        async function loadUsersAdmin() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/get-users`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ token: userToken })
+                });
+                const users = await res.json();
+                const list = document.getElementById("userList");
+                list.innerHTML = "";
+                users.forEach(u => {
+                    list.innerHTML += `<li><b>${u.name}</b> (@${u.username}) - <span class="text-xs font-bold text-blue-500">${u.role.toUpperCase()}</span></li>`;
+                });
+            } catch (err) { console.error(err); }
+        }
     </script>
 </body>
 </html>
