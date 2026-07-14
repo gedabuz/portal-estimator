@@ -22,7 +22,7 @@
                 <div><label class="block text-sm font-medium mb-1">Password</label><input type="password" id="loginPass" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"></div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">Masuk</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Dibuat oleh gedabuz ©2026</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Dibuat oleh Gedabu © 2026</p>
         </div>
     </div>
 
@@ -35,6 +35,7 @@
                 <div>
                     <label class="block font-medium mb-1">Kategori</label>
                     <select id="editCategory" class="w-full border p-2 rounded">
+                        <option value="BOQ">BOQ (Hasil Hitungan)</option>
                         <option value="BQ">BQ</option>
                         <option value="Final Account">Final Account</option>
                         <option value="Tender">Tender</option>
@@ -42,6 +43,8 @@
                         <option value="Forcon">Forcon</option>
                         <option value="Asbuilt">Asbuilt</option>
                         <option value="Price List">Price List</option>
+                        <option value="Gambar Perencana">Gambar Perencana</option>
+                        <option value="Harga Material">Harga Material</option>
                     </select>
                 </div>
                 <div><label class="block font-medium mb-1">Keterangan Khusus</label><textarea id="editKeterangan" rows="2" class="w-full border p-2 rounded"></textarea></div>
@@ -56,12 +59,13 @@
     <div id="mainApp" class="flex w-full h-full hidden">
         <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-lg shrink-0">
             <div class="p-6 border-b border-gray-700">
-                <h1 class="text-xl font-bold tracking-wider">Dokument<span class="text-blue-400">Hub</span></h1>
-                <p class="text-xs text-gray-400 mt-1">File Storage System</p>
+                <h1 class="text-xl font-bold tracking-wider">Estimator<span class="text-blue-400">Hub</span></h1>
+                <p class="text-xs text-gray-400 mt-1">Sistem Manajemen Internal</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard</button>
+                <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard File</button>
                 <button onclick="switchMenu('upload')" id="menu-upload" class="w-full text-left p-3 rounded menu-inactive">⬆️ Upload File Baru</button>
+                <button onclick="switchMenu('settings')" id="menu-settings" class="w-full text-left p-3 rounded menu-inactive">⚙️ Pengaturan Akun</button>
                 <button onclick="switchMenu('admin')" id="menu-admin" class="w-full text-left p-3 rounded menu-inactive hidden">🔑 Manajemen User</button>
             </nav>
             <div class="p-4 border-t border-gray-700 text-sm">
@@ -74,12 +78,10 @@
         <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
             <div id="view-dashboard" class="flex-1 overflow-y-auto p-6">
                 <h2 class="text-2xl font-bold mb-6">Dashboard File Terunggah</h2>
-                
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex gap-4">
                     <input type="text" id="searchBox" placeholder="Cari nama file, proyek, kategori, keterangan, atau uploader..." class="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500">
                     <input type="date" id="searchDate" class="border p-2 rounded text-gray-600">
                 </div>
-
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-blue-50 border-b border-gray-200 text-sm font-semibold">
@@ -130,6 +132,27 @@
                 </div>
             </div>
 
+            <div id="view-settings" class="flex-1 overflow-y-auto p-6 hidden">
+                <h2 class="text-2xl font-bold mb-6">Pengaturan Akun Anda</h2>
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200 max-w-md">
+                    <form id="profileForm" class="space-y-4">
+                        <div>
+                            <label class="block font-medium mb-1">Nama Lengkap Tampilan</label>
+                            <input type="text" id="profileName" required class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Username Baru</label>
+                            <input type="text" id="profileUsername" required class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Password Baru (Kosongkan jika tidak diganti)</label>
+                            <input type="password" id="profilePassword" placeholder="••••••••" class="w-full border p-2 rounded">
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+
             <div id="view-admin" class="flex-1 overflow-y-auto p-6 hidden">
                 <h2 class="text-2xl font-bold mb-6">Manajemen Anggota Tim</h2>
                 <div class="bg-white p-6 rounded-lg shadow border border-gray-200 max-w-xl mb-8">
@@ -148,18 +171,19 @@
             </div>
 
             <footer class="bg-white p-4 border-t border-gray-200 text-center text-sm font-medium text-gray-500 mt-auto">
-                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Gedabuz</span> © 2026
+                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Gedabu</span> © 2026
             </footer>
         </main>
     </div>
 
     <script>
-        // MASUKKAN URL RAILWAY ANDA
-        const BACKEND_URL = "https://backend-estimator-production-d0e4.up.railway.app"; 
+        // MASUKKAN URL RAILWAY ANDA DI SINI
+        const BACKEND_URL = "https://URL-RAILWAY-ANDA.up.railway.app"; 
 
         let userToken = localStorage.getItem('token');
         let userRole = localStorage.getItem('role');
         let userName = localStorage.getItem('name');
+        let currentUsername = localStorage.getItem('username');
         let dbData = [];
         let sortDirection = true;
 
@@ -174,8 +198,12 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    localStorage.setItem('token', data.token); localStorage.setItem('role', data.role); localStorage.setItem('name', data.name);
-                    userToken = data.token; userRole = data.role; userName = data.name; showApp();
+                    localStorage.setItem('token', data.token); 
+                    localStorage.setItem('role', data.role); 
+                    localStorage.setItem('name', data.name);
+                    localStorage.setItem('username', data.username);
+                    userToken = data.token; userRole = data.role; userName = data.name; currentUsername = data.username;
+                    showApp();
                 } else { alert(data.message); }
             } catch (err) { alert('Gagal terhubung ke server'); }
         });
@@ -186,7 +214,12 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('displayUserName').innerText = userName;
-            if (userRole === 'Admin') {
+            
+            // Isi form pengaturan profil dengan data saat ini
+            document.getElementById('profileName').value = userName;
+            document.getElementById('profileUsername').value = currentUsername;
+
+            if (userRole === 'admin') {
                 document.getElementById('menu-admin').classList.remove('hidden');
                 loadUsersAdmin();
             }
@@ -194,11 +227,38 @@
         }
 
         function switchMenu(viewName) {
-            ['dashboard', 'upload', 'admin'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            ['dashboard', 'upload', 'admin'].forEach(v => document.getElementById(`menu-${v}`).className = "w-full text-left p-3 rounded menu-inactive" + (v==='admin' && userRole!=='Admin' ? ' hidden' : ''));
+            ['dashboard', 'upload', 'settings', 'admin'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+            ['dashboard', 'upload', 'settings', 'admin'].forEach(v => document.getElementById(`menu-${v}`).className = "w-full text-left p-3 rounded menu-inactive" + (v=='admin' && userRole!=='admin' ? ' hidden' : ''));
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
             document.getElementById(`menu-${viewName}`).className = "w-full text-left p-3 rounded menu-active";
         }
+
+        // FUNGSI BARU: SUBMIT PERUBAHAN USERNAME / PASSWORD
+        document.getElementById("profileForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`${BACKEND_URL}/update-profile`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        token: userToken,
+                        newName: document.getElementById('profileName').value,
+                        newUsername: document.getElementById('profileUsername').value,
+                        newPassword: document.getElementById('profilePassword').value
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (data.status === 'success') {
+                    // Update data lokal browser
+                    localStorage.setItem('name', data.name);
+                    localStorage.setItem('username', data.username);
+                    userName = data.name; currentUsername = data.username;
+                    document.getElementById('displayUserName').innerText = userName;
+                    document.getElementById('profilePassword').value = ""; // Reset form password
+                    switchMenu('dashboard');
+                }
+            } catch (err) { alert('Gagal memperbarui profil.'); }
+        });
 
         document.getElementById("uploadForm").addEventListener("submit", function(e) {
             e.preventDefault();
@@ -241,8 +301,7 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             data.forEach(item => {
-                // UPDATE: Cek hak akses untuk tombol Edit & Hapus
-                const canModify = (userRole === 'Admin' || userName === item.user);
+                const canModify = (userRole === 'admin' || userName === item.user);
                 const modifyBtns = canModify ? 
                     `<button onclick="openEditModal(${item.id}, '${item.project}', '${item.category}', '${item.keterangan}')" class="text-blue-500 font-bold hover:underline mx-1">Edit</button> | 
                      <button onclick="deleteFile(${item.id})" class="text-red-500 font-bold hover:underline mx-1">Hapus</button>` : '';
@@ -263,7 +322,6 @@
             });
         }
 
-        // UPDATE: Omni-search
         document.getElementById("searchBox").addEventListener("input", (e) => {
             const val = e.target.value.toLowerCase();
             const filtered = dbData.filter(i => 
@@ -286,7 +344,6 @@
             renderTable([...dbData].sort((a, b) => (a[column] < b[column] ? (sortDirection?-1:1) : (a[column] > b[column] ? (sortDirection?1:-1) : 0))));
         }
 
-        // --- FUNGSI EDIT DAN HAPUS ---
         function openEditModal(id, project, category, keterangan) {
             document.getElementById('editFileId').value = id;
             document.getElementById('editProject').value = project;
@@ -329,7 +386,6 @@
             } catch (err) { alert('Gagal menghapus file.'); }
         }
 
-        // --- ADMIN ---
         document.getElementById("createUserForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             try {
