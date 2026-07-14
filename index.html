@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Estimator & BOQ Profesional</title>
+    <title>Portal Dokument Storage</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sort-icon { font-size: 0.8em; color: #9ca3af; margin-left: 4px; cursor: pointer; }
@@ -22,7 +22,7 @@
                 <div><label class="block text-sm font-medium mb-1">Password</label><input type="password" id="loginPass" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"></div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">Masuk</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Dibuat oleh Gedabu © 2026</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Dibuat oleh gedabuz ©2026</p>
         </div>
     </div>
 
@@ -35,7 +35,6 @@
                 <div>
                     <label class="block font-medium mb-1">Kategori</label>
                     <select id="editCategory" class="w-full border p-2 rounded">
-                        <option value="BOQ">BOQ (Hasil Hitungan)</option>
                         <option value="BQ">BQ</option>
                         <option value="Final Account">Final Account</option>
                         <option value="Tender">Tender</option>
@@ -43,8 +42,6 @@
                         <option value="Forcon">Forcon</option>
                         <option value="Asbuilt">Asbuilt</option>
                         <option value="Price List">Price List</option>
-                        <option value="Gambar Perencana">Gambar Perencana</option>
-                        <option value="Harga Material">Harga Material</option>
                     </select>
                 </div>
                 <div><label class="block font-medium mb-1">Keterangan Khusus</label><textarea id="editKeterangan" rows="2" class="w-full border p-2 rounded"></textarea></div>
@@ -59,11 +56,11 @@
     <div id="mainApp" class="flex w-full h-full hidden">
         <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-lg shrink-0">
             <div class="p-6 border-b border-gray-700">
-                <h1 class="text-xl font-bold tracking-wider">Estimator<span class="text-blue-400">Hub</span></h1>
-                <p class="text-xs text-gray-400 mt-1">Sistem Manajemen Internal</p>
+                <h1 class="text-xl font-bold tracking-wider">Dokument<span class="text-blue-400">Hub</span></h1>
+                <p class="text-xs text-gray-400 mt-1">File Storage System</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard File</button>
+                <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard</button>
                 <button onclick="switchMenu('upload')" id="menu-upload" class="w-full text-left p-3 rounded menu-inactive">⬆️ Upload File Baru</button>
                 <button onclick="switchMenu('admin')" id="menu-admin" class="w-full text-left p-3 rounded menu-inactive hidden">🔑 Manajemen User</button>
             </nav>
