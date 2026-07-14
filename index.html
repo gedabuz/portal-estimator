@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Dokument Storage</title>
+    <title>Portal dokumentDrive Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sort-icon { font-size: 0.8em; color: #9ca3af; margin-left: 4px; cursor: pointer; }
@@ -59,8 +59,8 @@
     <div id="mainApp" class="flex w-full h-full hidden">
         <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-lg shrink-0">
             <div class="p-6 border-b border-gray-700">
-                <h1 class="text-xl font-bold tracking-wider">Estimator<span class="text-blue-400">Hub</span></h1>
-                <p class="text-xs text-gray-400 mt-1">Sistem Manajemen Internal</p>
+                <h1 class="text-xl font-bold tracking-wider">dokument<span class="text-blue-400">Drive</span></h1>
+                <p class="text-xs text-gray-400 mt-1">sistem penyimpanan file</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="switchMenu('dashboard')" id="menu-dashboard" class="w-full text-left p-3 rounded menu-active">📊 Dashboard File</button>
@@ -136,18 +136,9 @@
                 <h2 class="text-2xl font-bold mb-6">Pengaturan Akun Anda</h2>
                 <div class="bg-white p-6 rounded-lg shadow border border-gray-200 max-w-md">
                     <form id="profileForm" class="space-y-4">
-                        <div>
-                            <label class="block font-medium mb-1">Nama Lengkap Tampilan</label>
-                            <input type="text" id="profileName" required class="w-full border p-2 rounded">
-                        </div>
-                        <div>
-                            <label class="block font-medium mb-1">Username Baru</label>
-                            <input type="text" id="profileUsername" required class="w-full border p-2 rounded">
-                        </div>
-                        <div>
-                            <label class="block font-medium mb-1">Password Baru (Kosongkan jika tidak diganti)</label>
-                            <input type="password" id="profilePassword" placeholder="••••••••" class="w-full border p-2 rounded">
-                        </div>
+                        <div><label class="block font-medium mb-1">Nama Lengkap Tampilan</label><input type="text" id="profileName" required class="w-full border p-2 rounded"></div>
+                        <div><label class="block font-medium mb-1">Username Baru</label><input type="text" id="profileUsername" required class="w-full border p-2 rounded"></div>
+                        <div><label class="block font-medium mb-1">Password Baru (Kosongkan jika tidak diganti)</label><input type="password" id="profilePassword" placeholder="••••••••" class="w-full border p-2 rounded"></div>
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">Simpan Perubahan</button>
                     </form>
                 </div>
@@ -166,12 +157,12 @@
                 </div>
                 <div class="bg-white rounded-lg shadow border border-gray-200 p-4 max-w-xl">
                     <h3 class="font-bold text-lg mb-2">Daftar Anggota Tim</h3>
-                    <ul id="userList" class="list-disc pl-5 text-gray-600"></ul>
+                    <ul id="userList" class="divide-y divide-gray-200 text-gray-600"></ul>
                 </div>
             </div>
 
             <footer class="bg-white p-4 border-t border-gray-200 text-center text-sm font-medium text-gray-500 mt-auto">
-                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Gedabu</span> © 2026
+                sistem penyimpanan file | Dibuat oleh <span class="text-blue-600 font-bold">Gedabuz</span> © 2026
             </footer>
         </main>
     </div>
@@ -198,12 +189,8 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    localStorage.setItem('token', data.token); 
-                    localStorage.setItem('role', data.role); 
-                    localStorage.setItem('name', data.name);
-                    localStorage.setItem('username', data.username);
-                    userToken = data.token; userRole = data.role; userName = data.name; currentUsername = data.username;
-                    showApp();
+                    localStorage.setItem('token', data.token); localStorage.setItem('role', data.role); localStorage.setItem('name', data.name); localStorage.setItem('username', data.username);
+                    userToken = data.token; userRole = data.role; userName = data.name; currentUsername = data.username; showApp();
                 } else { alert(data.message); }
             } catch (err) { alert('Gagal terhubung ke server'); }
         });
@@ -214,8 +201,6 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('displayUserName').innerText = userName;
-            
-            // Isi form pengaturan profil dengan data saat ini
             document.getElementById('profileName').value = userName;
             document.getElementById('profileUsername').value = currentUsername;
 
@@ -226,6 +211,7 @@
             loadFiles();
         }
 
+        /* Navigasi Menu */
         function switchMenu(viewName) {
             ['dashboard', 'upload', 'settings', 'admin'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
             ['dashboard', 'upload', 'settings', 'admin'].forEach(v => document.getElementById(`menu-${v}`).className = "w-full text-left p-3 rounded menu-inactive" + (v=='admin' && userRole!=='admin' ? ' hidden' : ''));
@@ -233,33 +219,25 @@
             document.getElementById(`menu-${viewName}`).className = "w-full text-left p-3 rounded menu-active";
         }
 
-        // FUNGSI BARU: SUBMIT PERUBAHAN USERNAME / PASSWORD
+        /* Update Profil */
         document.getElementById("profileForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             try {
                 const res = await fetch(`${BACKEND_URL}/update-profile`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        token: userToken,
-                        newName: document.getElementById('profileName').value,
-                        newUsername: document.getElementById('profileUsername').value,
-                        newPassword: document.getElementById('profilePassword').value
-                    })
+                    body: JSON.stringify({ token: userToken, newName: document.getElementById('profileName').value, newUsername: document.getElementById('profileUsername').value, newPassword: document.getElementById('profilePassword').value })
                 });
-                const data = await res.json();
-                alert(data.message);
+                const data = await res.json(); alert(data.message);
                 if (data.status === 'success') {
-                    // Update data lokal browser
-                    localStorage.setItem('name', data.name);
-                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('name', data.name); localStorage.setItem('username', data.username);
                     userName = data.name; currentUsername = data.username;
                     document.getElementById('displayUserName').innerText = userName;
-                    document.getElementById('profilePassword').value = ""; // Reset form password
-                    switchMenu('dashboard');
+                    document.getElementById('profilePassword').value = ""; switchMenu('dashboard');
                 }
             } catch (err) { alert('Gagal memperbarui profil.'); }
         });
 
+        /* Upload File dengan Progress Bar */
         document.getElementById("uploadForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const btn = document.getElementById("btnSubmitUpload");
@@ -292,11 +270,13 @@
             xhr.send(formData);
         });
 
+        /* Mengambil Daftar File */
         async function loadFiles() {
             try { const res = await fetch(`${BACKEND_URL}/files`); dbData = await res.json(); renderTable(dbData); } 
             catch (err) { console.error(err); }
         }
 
+        /* Membuat Tabel Data */
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -322,6 +302,7 @@
             });
         }
 
+        /* Omni Search */
         document.getElementById("searchBox").addEventListener("input", (e) => {
             const val = e.target.value.toLowerCase();
             const filtered = dbData.filter(i => 
@@ -339,11 +320,13 @@
             renderTable(dbData.filter(i => val === "" || i.date === val));
         });
 
+        /* Urutkan Data (Sorting) */
         function sortTable(column) {
             sortDirection = !sortDirection;
             renderTable([...dbData].sort((a, b) => (a[column] < b[column] ? (sortDirection?-1:1) : (a[column] > b[column] ? (sortDirection?1:-1) : 0))));
         }
 
+        /* Aksi Edit File */
         function openEditModal(id, project, category, keterangan) {
             document.getElementById('editFileId').value = id;
             document.getElementById('editProject').value = project;
@@ -360,32 +343,24 @@
             try {
                 const res = await fetch(`${BACKEND_URL}/files/${id}`, {
                     method: 'PUT', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        token: userToken,
-                        project: document.getElementById('editProject').value,
-                        category: document.getElementById('editCategory').value,
-                        keterangan: document.getElementById('editKeterangan').value
-                    })
+                    body: JSON.stringify({ token: userToken, project: document.getElementById('editProject').value, category: document.getElementById('editCategory').value, keterangan: document.getElementById('editKeterangan').value })
                 });
-                const data = await res.json();
-                alert(data.message);
+                const data = await res.json(); alert(data.message);
                 if (data.status === 'success') { closeEditModal(); loadFiles(); }
             } catch (err) { alert('Gagal update data.'); }
         });
 
+        /* Aksi Hapus File */
         async function deleteFile(id) {
             if (!confirm("Yakin ingin menghapus file ini? File juga akan dihapus dari Telegram.")) return;
             try {
-                const res = await fetch(`${BACKEND_URL}/files/${id}`, {
-                    method: 'DELETE', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ token: userToken })
-                });
-                const data = await res.json();
-                alert(data.message);
+                const res = await fetch(`${BACKEND_URL}/files/${id}`, { method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: userToken }) });
+                const data = await res.json(); alert(data.message);
                 if (data.status === 'success') loadFiles();
             } catch (err) { alert('Gagal menghapus file.'); }
         }
 
+        /* Manajemen Anggota Tim */
         document.getElementById("createUserForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             try {
@@ -402,9 +377,13 @@
             try {
                 const res = await fetch(`${BACKEND_URL}/get-users`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ token: userToken }) });
                 const users = await res.json();
-                document.getElementById("userList").innerHTML = users.map(u => `<li><b>${u.name}</b> (@${u.username}) - <span class="text-xs font-bold text-blue-500">${u.role.toUpperCase()}</span></li>`).join('');
-            } catch (err) {}
-        }
-    </script>
-</body>
-</html>
+                document.getElementById("userList").innerHTML = users.map(u => {
+                    const deleteBtn = u.role !== 'admin' ? 
+                        `<button onclick="deleteUser('${u.username}')" class="bg-red-100 hover:bg-red-200 text-red-600 font-bold px-3 py-1 text-xs rounded transition ml-4">Hapus</button>` : '';
+                    
+                    return `
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <div>
+                                <span class="font-bold text-gray-800">${u.name}</span> 
+                                <span class="text-sm text-gray-500 ml-1">(@${u.username})</span>
+                                <span class="text-[10px] font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded ml-
