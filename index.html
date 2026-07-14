@@ -148,7 +148,7 @@
             </div>
 
             <footer class="bg-white p-4 border-t border-gray-200 text-center text-sm font-medium text-gray-500 mt-auto">
-                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Gedabu</span> © 2026
+                Sistem Manajemen File Internal | Dibuat oleh <span class="text-blue-600 font-bold">Gedabuz</span> © 2026
             </footer>
         </main>
     </div>
@@ -186,7 +186,7 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('displayUserName').innerText = userName;
-            if (userRole === 'creator') {
+            if (userRole === 'Admin') {
                 document.getElementById('menu-admin').classList.remove('hidden');
                 loadUsersAdmin();
             }
@@ -195,7 +195,7 @@
 
         function switchMenu(viewName) {
             ['dashboard', 'upload', 'admin'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            ['dashboard', 'upload', 'admin'].forEach(v => document.getElementById(`menu-${v}`).className = "w-full text-left p-3 rounded menu-inactive" + (v==='admin' && userRole!=='creator' ? ' hidden' : ''));
+            ['dashboard', 'upload', 'admin'].forEach(v => document.getElementById(`menu-${v}`).className = "w-full text-left p-3 rounded menu-inactive" + (v==='admin' && userRole!=='Admin' ? ' hidden' : ''));
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
             document.getElementById(`menu-${viewName}`).className = "w-full text-left p-3 rounded menu-active";
         }
@@ -242,7 +242,7 @@
             tbody.innerHTML = '';
             data.forEach(item => {
                 // UPDATE: Cek hak akses untuk tombol Edit & Hapus
-                const canModify = (userRole === 'creator' || userName === item.user);
+                const canModify = (userRole === 'Admin' || userName === item.user);
                 const modifyBtns = canModify ? 
                     `<button onclick="openEditModal(${item.id}, '${item.project}', '${item.category}', '${item.keterangan}')" class="text-blue-500 font-bold hover:underline mx-1">Edit</button> | 
                      <button onclick="deleteFile(${item.id})" class="text-red-500 font-bold hover:underline mx-1">Hapus</button>` : '';
